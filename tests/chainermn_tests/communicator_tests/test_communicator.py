@@ -241,6 +241,7 @@ def test_communicator_cpu(param):
 @pytest.mark.parametrize('param', gpu_params)
 @chainer.testing.attr.gpu
 def test_communicator_gpu(param):
+    mpi_comm.Barrier()
     check_send_recv(param, True)
     check_collective_communication(param, True)
 
@@ -248,6 +249,7 @@ def test_communicator_gpu(param):
 class TestPureNcclCommunicator(unittest.TestCase):
 
     def setUp(self):
+        mpi_comm.Barrier()
         if nccl.get_version() < 2000:
             pytest.skip('This test requires NCCL version >= 2.0')
         self.mpi_comm = mpi4py.MPI.COMM_WORLD
