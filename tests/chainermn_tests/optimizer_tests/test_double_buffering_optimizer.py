@@ -25,6 +25,7 @@ class TestDoubleBufferingOptimizer(unittest.TestCase):
         if nccl.get_version() < 2000:
             pytest.skip('This test requires NCCL version >= 2.0')
         self.comm = chainermn.create_communicator('pure_nccl')
+        self.comm.mpi_comm.Barrier()
         device = self.comm.intra_rank
         chainer.cuda.get_device(device).use()
         self.target = ExampleModel()
@@ -102,6 +103,7 @@ class TestDoubleBufferingOptimizerWithDynamicModel(unittest.TestCase):
         if nccl.get_version() < 2000:
             pytest.skip('This test requires NCCL version >= 2.0')
         self.comm = chainermn.create_communicator('pure_nccl')
+        self.comm.mpi_comm.Barrier()
         device = self.comm.intra_rank
         chainer.cuda.get_device(device).use()
         self.target = DynamicExampleModel()
