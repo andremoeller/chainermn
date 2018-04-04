@@ -58,15 +58,15 @@ def init_ranks(mpi_comm):
     return my_ranks
 
 def add_log_in_nccl_destroy(actual_nccl_comm, rank):
-    actual_nccl_comm._original_destroy = actual_nccl_comm.destroy
+    actual_nccl_comm._original___dealloc__ = actual_nccl_comm.__dealloc__
     actual_rank = rank
 
-    def new_destroy(self):
+    def new___dealloc__(self):
         print('rank', actual_rank, 'call nccl destroy')
         return self._original_destroy()
 
-        actual_nccl_comm.destroy = six.create_bound_method(
-            new_destroy, actual_nccl_comm)
+    actual_nccl_comm.__dealloc__ = six.create_bound_method(
+        new___dealloc__, actual_nccl_comm)
     return actual_nccl_comm
 
 
