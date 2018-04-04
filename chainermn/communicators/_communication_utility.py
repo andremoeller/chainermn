@@ -79,13 +79,13 @@ def init_comms(mpi_comm, intra_rank, intra_size, inter_rank, use_nccl=True):
         print('rank', inter_rank, 'intra_nccl_comm_id', intra_nccl_comm_id)
         intra_nccl_comm = nccl.NcclCommunicator(
             intra_size, intra_nccl_comm_id, intra_rank)
-        intra_nccl_comm = add_log_in_nccl_destroy(intra_nccl_comm)
+        intra_nccl_comm = add_log_in_nccl_destroy(intra_nccl_comm, mpi_comm.rank)
         if nccl.get_version() >= 2000:
             nccl_comm_id = mpi_comm.bcast(nccl.get_unique_id())
             print('rank', mpi_comm.rank, 'inter nccl_comm_id', nccl_comm_id)
             nccl_comm = nccl.NcclCommunicator(
                 mpi_comm.size, nccl_comm_id, mpi_comm.rank)
-            nccl_comm = add_log_in_nccl_destroy(nccl_comm)
+            nccl_comm = add_log_in_nccl_destroy(nccl_comm, mpi_comm.rank)
         else:
             nccl_comm = None
         return intra_mpi_comm, inter_mpi_comm, intra_nccl_comm, nccl_comm
