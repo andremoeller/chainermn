@@ -57,18 +57,6 @@ def init_ranks(mpi_comm):
     assert my_ranks[0] == mpi_comm.rank
     return my_ranks
 
-def add_log_in_nccl_destroy(actual_nccl_comm, rank):
-    actual_nccl_comm._original___dealloc__ = actual_nccl_comm.__dealloc__
-    actual_rank = rank
-
-    def new___dealloc__(self):
-        print('rank', actual_rank, 'call nccl destroy')
-        return self._original_destroy()
-
-    actual_nccl_comm.__dealloc__ = six.create_bound_method(
-        new___dealloc__, actual_nccl_comm)
-    return actual_nccl_comm
-
 
 def init_comms(mpi_comm, intra_rank, intra_size, inter_rank, use_nccl=True):
     intra_mpi_comm = mpi_comm.Split(inter_rank, intra_rank)
@@ -79,13 +67,13 @@ def init_comms(mpi_comm, intra_rank, intra_size, inter_rank, use_nccl=True):
         print('rank', inter_rank, 'intra_nccl_comm_id', intra_nccl_comm_id)
         intra_nccl_comm = nccl.NcclCommunicator(
             intra_size, intra_nccl_comm_id, intra_rank)
-        intra_nccl_comm = add_log_in_nccl_destroy(intra_nccl_comm, mpi_comm.rank)
+        #intra_nccl_comm = add_log_in_nccl_destroy(intra_nccl_comm, mpi_comm.rank)
         if nccl.get_version() >= 2000:
             nccl_comm_id = mpi_comm.bcast(nccl.get_unique_id())
             print('rank', mpi_comm.rank, 'inter nccl_comm_id', nccl_comm_id)
             nccl_comm = nccl.NcclCommunicator(
                 mpi_comm.size, nccl_comm_id, mpi_comm.rank)
-            nccl_comm = add_log_in_nccl_destroy(nccl_comm, mpi_comm.rank)
+            #nccl_comm = add_log_in_nccl_destroy(nccl_comm, mpi_comm.rank)
         else:
             nccl_comm = None
         return intra_mpi_comm, inter_mpi_comm, intra_nccl_comm, nccl_comm
