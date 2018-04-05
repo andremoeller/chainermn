@@ -230,11 +230,11 @@ def check_collective_communication(param, use_gpu):
     check_allreduce_grad(communicator, model)
     check_allreduce_grad_empty(communicator, model)
 
-    if hasattr(communicator, 'intra_nccl_comm'):
-        del communicator.intra_nccl_comm
-
     if hasattr(communicator, 'nccl_comm'):
         del communicator.nccl_comm
+
+    if hasattr(communicator, 'intra_nccl_comm'):
+        del communicator.intra_nccl_comm
 
 
 # chainer.testing.parameterize is not available at functions
